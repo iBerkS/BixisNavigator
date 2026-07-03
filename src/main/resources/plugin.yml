@@ -8,9 +8,9 @@ description: Hotbar navigation plugin for the Bixis network
 commands:
   bixisnav:
     description: BixisNavigator yönetim komutu
-    usage: /bixisnav toggle
+    usage: /bixisnav <on|off>
 
 permissions:
-  bixisnavigator.toggle:
-    description: Navigator eşyalarını aç/kapat
+  bixisnavigator.admin:
+    description: Navigator hotbar'ı aç/kapat (builder mode)
     default: op

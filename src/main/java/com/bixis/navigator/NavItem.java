@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * The navigator items, identified purely by their PersistentDataContainer tag.
  *
- * <p>Every navigator item is tagged with {@link BixisNavigator#getItemKey()}
+ * <p>Every navigator item is tagged with {@link BixisNavigator#getNavKey()}
  * ("bixisnavigator:item") whose value is the enum {@link #id}. Identification and
  * routing of clicks is done exclusively through this tag, never through display names.
  */
@@ -74,7 +74,7 @@ public enum NavItem {
         }
 
         meta.getPersistentDataContainer()
-                .set(plugin.getItemKey(), PersistentDataType.STRING, id);
+                .set(plugin.getNavKey(), PersistentDataType.STRING, id);
 
         item.setItemMeta(meta);
         return item;
@@ -96,7 +96,7 @@ public enum NavItem {
         meta.displayName(styled(name));
         meta.lore(List.of(styled(VISIBILITY.lore)));
         meta.getPersistentDataContainer()
-                .set(plugin.getItemKey(), PersistentDataType.STRING, VISIBILITY.id);
+                .set(plugin.getNavKey(), PersistentDataType.STRING, VISIBILITY.id);
         item.setItemMeta(meta);
         return item;
     }
@@ -114,7 +114,7 @@ public enum NavItem {
         if (item == null || !item.hasItemMeta()) {
             return null;
         }
-        NamespacedKey key = plugin.getItemKey();
+        NamespacedKey key = plugin.getNavKey();
         return item.getItemMeta().getPersistentDataContainer()
                 .get(key, PersistentDataType.STRING);
     }

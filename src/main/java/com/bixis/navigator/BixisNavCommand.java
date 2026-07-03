@@ -2,6 +2,7 @@ package com.bixis.navigator;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.yeditepemc.bixisnavigator.api.NavigatorAPI;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -10,19 +11,20 @@ import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Stream;
 
 /**
- * Handles {@code /bixisnav toggle}, which shows/hides the player's own navigator items.
+ * Handles {@code /bixisnav on|off}, which enables/disables the player's navigator hotbar
+ * (builder mode) through the {@link NavigatorAPI}.
  */
 public final class BixisNavCommand implements CommandExecutor, TabCompleter {
 
-    private static final String TOGGLE_PERMISSION = "bixisnavigator.toggle";
+    private static final String ADMIN_PERMISSION = "bixisnavigator.admin";
 
-    private final BixisNavigator plugin;
+    private final NavigatorAPI api;
 
-    public BixisNavCommand(BixisNavigator plugin) {
-        this.plugin = plugin;
+    public BixisNavCommand(NavigatorAPI api) {
+        this.api = api;
     }
 
     @Override
@@ -33,35 +35,33 @@ public final class BixisNavCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if (args.length != 1 || !args[0].equalsIgnoreCase("toggle")) {
-            player.sendMessage(Component.text("Kullanım: /bixisnav toggle", NamedTextColor.YELLOW));
-            return true;
-        }
-
-        if (!player.hasPermission(TOGGLE_PERMISSION)) {
+        if (!player.hasPermission(ADMIN_PERMISSION)) {
             player.sendMessage(Component.text("Bunu yapmak için yetkin yok.", NamedTextColor.RED));
             return true;
         }
 
-        UUID id = player.getUniqueId();
-        if (plugin.getNavDisabled().remove(id)) {
-            // Was OFF -> turn ON: restore the four navigator items.
-            plugin.installNavItems(player);
-            player.sendMessage(Component.text("Navigator eşyaları açıldı.", NamedTextColor.GREEN));
+        if (args.length != 1) {
+            player.sendMessage(Component.text("Kullanım: /bixisnav <on|off>", NamedTextColor.YELLOW));
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("on")) {
+            api.enableNav(player);
+            player.sendMessage(Component.text("Navigator hotbar açıldı.", NamedTextColor.GREEN));
+        } else if (args[0].equalsIgnoreCase("off")) {
+            api.disableNav(player);
+            player.sendMessage(Component.text("Navigator hotbar kapatıldı.", NamedTextColor.GRAY));
         } else {
-            // Was ON -> turn OFF: clear the four navigator slots.
-            plugin.getNavDisabled().add(id);
-            plugin.clearNavItems(player);
-            player.sendMessage(Component.text("Navigator eşyaları kapatıldı.", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("Kullanım: /bixisnav <on|off>", NamedTextColor.YELLOW));
         }
         return true;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length == 1 && sender.hasPermission(TOGGLE_PERMISSION)
-                && "toggle".startsWith(args[0].toLowerCase())) {
-            return List.of("toggle");
+        if (args.length == 1 && sender.hasPermission(ADMIN_PERMISSION)) {
+            String prefix = args[0].toLowerCase();
+            return Stream.of("on", "off").filter(s -> s.startsWith(prefix)).toList();
         }
         return Collections.emptyList();
     }

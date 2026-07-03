@@ -1,9 +1,12 @@
 package com.bixis.navigator;
 
+import net.yeditepemc.bixisnavigator.api.NavigatorAPI;
+import net.yeditepemc.bixisnavigator.api.NavigatorAPIImpl;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
@@ -27,7 +30,15 @@ public final class BixisNavigator extends JavaPlugin {
         this.itemKey = new NamespacedKey(this, "item");
         getServer().getPluginManager().registerEvents(new NavListener(this), this);
 
-        BixisNavCommand command = new BixisNavCommand(this);
+        NavigatorAPIImpl api = new NavigatorAPIImpl(this);
+        getServer().getServicesManager().register(
+                NavigatorAPI.class,
+                api,
+                this,
+                ServicePriority.Normal
+        );
+
+        BixisNavCommand command = new BixisNavCommand(api);
         getCommand("bixisnav").setExecutor(command);
         getCommand("bixisnav").setTabCompleter(command);
 
@@ -40,7 +51,7 @@ public final class BixisNavigator extends JavaPlugin {
         navDisabled.clear();
     }
 
-    public NamespacedKey getItemKey() {
+    public NamespacedKey getNavKey() {
         return itemKey;
     }
 

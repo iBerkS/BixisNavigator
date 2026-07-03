@@ -1,6 +1,7 @@
 package com.bixis.navigator;
 
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,6 +18,8 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.UUID;
 
@@ -232,12 +235,18 @@ public final class NavListener implements Listener {
     }
 
     @EventHandler
-    public void onSwapHandItems(PlayerSwapHandItemsEvent event) {
-        // Pressing F during normal gameplay swaps the held item with the off hand
-        // and never passes through InventoryClickEvent.
-        if (NavItem.isNavItem(plugin, event.getMainHandItem())
-                || NavItem.isNavItem(plugin, event.getOffHandItem())) {
+    public void onSwapHands(PlayerSwapHandItemsEvent event) {
+        ItemStack main = event.getMainHandItem();
+        ItemStack off = event.getOffHandItem();
+        if (isNavItem(main) || isNavItem(off)) {
             event.setCancelled(true);
         }
+    }
+
+    private boolean isNavItem(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return false;
+        if (!item.hasItemMeta()) return false;
+        PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
+        return pdc.has(plugin.getNavKey(), PersistentDataType.STRING);
     }
 }
