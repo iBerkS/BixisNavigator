@@ -1,0 +1,16 @@
+name: BixisNavigator
+version: ${project.version}
+main: com.bixis.navigator.BixisNavigator
+api-version: '26.1.2'
+authors: [Bixis]
+description: Hotbar navigation plugin for the Bixis network
+
+commands:
+  bixisnav:
+    description: BixisNavigator yönetim komutu
+    usage: /bixisnav toggle
+
+permissions:
+  bixisnavigator.toggle:
+    description: Navigator eşyalarını aç/kapat
+    default: op
