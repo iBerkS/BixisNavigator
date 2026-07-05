@@ -43,6 +43,32 @@
                     <release>${java.version}</release>
                 </configuration>
             </plugin>
+            <!--
+                Install the built jar into the local Maven repository under the
+                net.yeditepemc:BixisNavigator:1.1.0 coordinate so that other plugins
+                (e.g. BixisParkour) can depend on the NavigatorAPI with provided scope.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>3.1.2</version>
+                <executions>
+                    <execution>
+                        <id>install-navigator-api</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${project.build.directory}/${project.build.finalName}.jar</file>
+                            <groupId>net.yeditepemc</groupId>
+                            <artifactId>BixisNavigator</artifactId>
+                            <version>1.1.0</version>
+                            <packaging>jar</packaging>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <resources>
             <resource>
